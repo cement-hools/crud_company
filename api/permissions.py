@@ -6,7 +6,7 @@ from user.models import Roles
 
 
 class CompanyPermission(permissions.BasePermission):
-    """."""
+    """Права для компаний."""
 
     def has_permission(self, request, view):
         if request.method in permissions.SAFE_METHODS:
@@ -39,7 +39,7 @@ class CompanyPermission(permissions.BasePermission):
 
 
 class NewsPermission(permissions.BasePermission):
-    """."""
+    """Права для новостей."""
     def has_permission(self, request, view):
         if request.user.is_staff and request.user.is_superuser:
             return True

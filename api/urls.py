@@ -13,12 +13,9 @@ company_router.register(
 profile_router = DefaultRouter()
 profile_router.register('profiles', ProfileViewSet, basename='profiles')
 
-
 urlpatterns = [
 
     path('v1/', include(company_router.urls)),
     path('v1/', include(profile_router.urls)),
-    # path('v2/all/', include(transactions_all_router.urls)),
-    # path('v2/wallets/<int:wallet_id>/', include(transaction_router.urls)),
 
 ]

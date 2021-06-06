@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser
 from rest_framework.viewsets import ModelViewSet
@@ -11,7 +10,7 @@ from user.models import Profile
 
 
 class CompanyViewSet(ModelViewSet):
-    """."""
+    """Вьюсет компаний."""
     permission_classes = (CompanyPermission,)
     serializer_class = CompanySerializer
     action_serializers = {
@@ -28,16 +27,12 @@ class CompanyViewSet(ModelViewSet):
         return super(CompanyViewSet, self).get_serializer_class()
 
     def get_queryset(self):
-        # queryset = Wallet.objects.filter(owner=self.request.user)
         queryset = Company.objects.all()
         return queryset
 
-    # def perform_create(self, serializer):
-    #     serializer.save(owner=self.request.user)
-
 
 class NewsViewSet(ModelViewSet):
-    """."""
+    """Вьюсет новостей."""
     permission_classes = (IsAuthenticatedOrReadOnly, NewsPermission,)
     serializer_class = NewsSerializer
 
@@ -59,7 +54,7 @@ class NewsViewSet(ModelViewSet):
 
 
 class ProfileViewSet(ModelViewSet):
-    """."""
+    """Вьюсет профилей."""
     permission_classes = (IsAdminUser,)
     serializer_class = ProfileSerializer
     queryset = Profile.objects.all()

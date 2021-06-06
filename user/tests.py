@@ -305,6 +305,7 @@ class CompanyApiTestCase(APITestCase):
         serializer_data = NewsSerializer(new_news).data
 
         self.assertEqual(response.data, serializer_data)
+        self.assertEqual(self.user_1, new_news.author)
 
     def test_create_new_news_in_not_owner_company(self):
         """Создание пользователем новой новости не в своей компании."""
