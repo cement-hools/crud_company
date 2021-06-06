@@ -1,4 +1,7 @@
+from django.contrib.auth import get_user_model
 from django.db import models
+
+User = get_user_model()
 
 
 class Company(models.Model):
@@ -10,7 +13,7 @@ class Company(models.Model):
     class Meta:
         verbose_name = 'Компания'
         verbose_name_plural = 'Компании'
-        ordering = ('-id',)
+        ordering = ('id',)
 
     def __str__(self):
         return self.name
@@ -24,6 +27,12 @@ class News(models.Model):
         on_delete=models.CASCADE,
         related_name='news',
         verbose_name='Компания'
+    )
+    author = models.ForeignKey(
+        to=User,
+        on_delete=models.CASCADE,
+        related_name='news',
+        verbose_name='Автор'
     )
     pub_date = models.DateTimeField(
         verbose_name='Дата публикации',

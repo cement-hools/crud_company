@@ -7,7 +7,11 @@ User = get_user_model()
 
 
 class Profile(models.Model):
-    user = models.OneToOneField(to=User, on_delete=models.CASCADE)
+    user = models.OneToOneField(
+        to=User,
+        on_delete=models.CASCADE,
+        related_name='profile'
+    )
     company = models.ForeignKey(
         to=Company,
         on_delete=models.CASCADE,
