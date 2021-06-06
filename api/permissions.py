@@ -11,6 +11,8 @@ class CompanyPermission(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.method in permissions.SAFE_METHODS:
             return True
+        if request.user.is_authenticated and not request.user.profile:
+            return False
         return bool(
             (request.user.is_staff and request.user.is_superuser)
             or (
