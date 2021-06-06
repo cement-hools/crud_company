@@ -50,6 +50,13 @@ class CompanyDetailSerializer(ModelSerializer):
         fields = '__all__'
 
     news = NewsSerializer(many=True, read_only=True)
+    amount_of_employees = serializers.SerializerMethodField()
+
+    def get_amount_of_employees(self, obj):
+        amount = obj.profiles.all().count()
+        return amount
+
+
 
 
 class ProfileSerializer(ModelSerializer):

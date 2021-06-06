@@ -4,12 +4,10 @@ from rest_framework.routers import DefaultRouter
 
 from user.views import CreateUserView
 
-registration_router = DefaultRouter()
-registration_router.register('reg', CreateUserView, basename='reg')
-
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include(registration_router.urls)),
+    path('api/registration/', CreateUserView.as_view({'post': 'create'}),
+         name='registration'),
     path('api/auth/', include('rest_framework.urls')),
 
     path('api/', include('api.urls')),

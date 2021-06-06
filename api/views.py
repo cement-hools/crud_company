@@ -47,7 +47,6 @@ class NewsViewSet(ModelViewSet):
             Company.objects.prefetch_related('news').all(),
             id=company_id,
         )
-        print(company.news.all())
         return company.news.all()
 
     def perform_create(self, serializer):

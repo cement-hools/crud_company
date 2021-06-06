@@ -13,13 +13,6 @@ company_router.register(
 profile_router = DefaultRouter()
 profile_router.register('profiles', ProfileViewSet, basename='profiles')
 
-# transaction_router = DefaultRouter()
-# transaction_router.register('transactions', WalletTransactionViewSet,
-#                             basename='transactions')
-
-# transactions_all_router = DefaultRouter()
-# transactions_all_router.register('transactions', UserTransactionViewSet,
-#                                  basename='user_transactions')
 
 urlpatterns = [
 
