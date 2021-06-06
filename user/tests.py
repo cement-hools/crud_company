@@ -3,9 +3,9 @@ from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 
 from api.models import Company, News
-from api.serializers import CompanySerializer, NewsSerializer
+from api.serializers import (CompanySerializer, NewsSerializer,
+                             ProfileSerializer)
 from .models import User, Profile, Roles
-from .serializers import UserSerializer
 
 
 class CompanyApiTestCase(APITestCase):
@@ -105,7 +105,7 @@ class CompanyApiTestCase(APITestCase):
         response = self.client_admin.post(url, data=data)
 
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
-        self.assertEqual(3, User.objects.all().count())
+        self.assertEqual(3, Company.objects.all().count())
         new_company = Company.objects.all().last()
         serializer_data = CompanySerializer(new_company).data
 
@@ -223,7 +223,7 @@ class CompanyApiTestCase(APITestCase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(serializer_data, response.data)
 
-    def test_get_news_edit_author(self):
+    def test_news_edit_author(self):
         """Автор редактирует свою новость."""
         old_news = {'title': self.news_1.title, 'text': self.news_1.text}
         url = reverse('news-detail', args=(self.company_1.id, self.news_1.id,))
@@ -238,7 +238,7 @@ class CompanyApiTestCase(APITestCase):
         self.assertEqual('edit', self.news_1.title)
         self.assertEqual('edited text', self.news_1.text)
 
-    def test_get_news_edit_non_author(self):
+    def test_news_edit_non_author(self):
         """Не автор редактирует новость."""
         url = reverse('news-detail', args=(self.company_1.id, self.news_2.id,))
 
@@ -247,7 +247,7 @@ class CompanyApiTestCase(APITestCase):
 
         self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
 
-    def test_get_news_edit_admin(self):
+    def test_news_edit_admin(self):
         """Админ редактирует новость."""
         old_news = {'title': self.news_1.title, 'text': self.news_1.text}
         url = reverse('news-detail', args=(self.company_1.id, self.news_1.id,))
@@ -262,7 +262,36 @@ class CompanyApiTestCase(APITestCase):
         self.assertEqual('edit', self.news_1.title)
         self.assertEqual('edited text', self.news_1.text)
 
-    def test_create_new_company(self):
+    def test_news_edit_moderator(self):
+        """Модератор редактирует новость."""
+        old_news = {'title': self.news_2.title, 'text': self.news_2.text}
+        url = reverse('news-detail', args=(self.company_1.id, self.news_2.id,))
+
+        self.profile_1.role = Roles.MODERATOR
+
+        data = {'title': 'edit', 'text': 'edited text'}
+        response = self.client.put(url, data=data)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.news_2.refresh_from_db()
+        self.assertNotEqual(old_news['title'], self.news_2.title)
+        self.assertNotEqual(old_news['text'], self.news_2.text)
+        self.assertEqual('edit', self.news_2.title)
+        self.assertEqual('edited text', self.news_2.text)
+
+    def test_news_edit_moderator_not_owner_company(self):
+        """Модератор редактирует новость не своей компании."""
+        old_news = {'title': self.news_2.title, 'text': self.news_2.text}
+        url = reverse('news-detail', args=(self.company_2.id, self.news_2.id,))
+
+        self.profile_1.role = Roles.MODERATOR
+
+        data = {'title': 'edit', 'text': 'edited text'}
+        response = self.client.put(url, data=data)
+
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+
+    def test_create_new_news_in_owner_company(self):
         """Создание пользователем новой новости в своей компании."""
         self.assertEqual(2, News.objects.all().count())
         data = {'title': 'news_3', 'text': 'edited text news_3'}
@@ -271,8 +300,39 @@ class CompanyApiTestCase(APITestCase):
         response = self.client.post(url, data=data)
 
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
-        self.assertEqual(3, User.objects.all().count())
-        new_company = Company.objects.all().last()
-        serializer_data = CompanySerializer(new_company).data
+        self.assertEqual(3, News.objects.all().count())
+        new_news = News.objects.all().first()
+        serializer_data = NewsSerializer(new_news).data
 
         self.assertEqual(response.data, serializer_data)
+
+    def test_create_new_news_in_not_owner_company(self):
+        """Создание пользователем новой новости не в своей компании."""
+        self.assertEqual(2, News.objects.all().count())
+        data = {'title': 'news_3', 'text': 'edited text news_3'}
+        url = reverse('news-list', args=(self.company_2.id,))
+
+        response = self.client.post(url, data=data)
+
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+        self.assertEqual(2, News.objects.all().count())
+
+    def test_profile_list_not_admin(self):
+        """Не админ не может просматривать профили"""
+        url = reverse('profiles-list')
+
+        response = self.client.get(url)
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+
+        response = self.client_not_auth.get(url)
+        self.assertEqual(status.HTTP_401_UNAUTHORIZED, response.status_code)
+
+    def test_profile_list(self):
+        """Список всех профилей."""
+        url = reverse('profiles-list')
+        profiles = Profile.objects.all()
+        response = self.client_admin.get(url)
+        serializer_data = ProfileSerializer(profiles, many=True).data
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(serializer_data, response.data)

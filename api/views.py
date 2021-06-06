@@ -42,7 +42,7 @@ class NewsViewSet(ModelViewSet):
     serializer_class = NewsSerializer
 
     def get_queryset(self):
-        company_id = self.kwargs['company_id']
+        company_id = self.kwargs.get('company_id')
         company = get_object_or_404(
             Company.objects.prefetch_related('news').all(),
             id=company_id,
@@ -50,7 +50,12 @@ class NewsViewSet(ModelViewSet):
         return company.news.all()
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        company_id = self.kwargs.get('company_id')
+        company = get_object_or_404(
+            Company.objects.prefetch_related('news').all(),
+            id=company_id,
+        )
+        serializer.save(author=self.request.user, company=company)
 
 
 class ProfileViewSet(ModelViewSet):
