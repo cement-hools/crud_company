@@ -15,7 +15,7 @@ profile_router.register('profiles', ProfileViewSet, basename='profiles')
 
 urlpatterns = [
 
-    path('v1/', include(company_router.urls), name='companies'),
+    path('v1/', include(company_router.urls)),
     path('v1/', include(profile_router.urls)),
 
 ]
