@@ -11,7 +11,7 @@ class Profile(models.Model):
     company = models.ForeignKey(
         to=Company,
         on_delete=models.CASCADE,
-        related_name='news',
+        related_name='profiles',
         verbose_name='Компания'
     )
 
