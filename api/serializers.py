@@ -1,8 +1,21 @@
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
-from api.models import Company
+from api.models import Company, News
+from user.models import Profile
 
+
+class NewsSerializer(ModelSerializer):
+    """."""
+
+    class Meta:
+        model = News
+        fields = '__all__'
+
+    author = serializers.SlugRelatedField(slug_field='username',
+                                          read_only=True)
+    company = serializers.SlugRelatedField(slug_field='name',
+                                          read_only=True)
 
 class CompanySerializer(ModelSerializer):
     """."""
@@ -27,3 +40,21 @@ class CompanySerializer(ModelSerializer):
     #             code_400 = status.HTTP_400_BAD_REQUEST
     #             raise serializers.ValidationError(code=code_400)
     #     return data
+
+
+class CompanyDetailSerializer(ModelSerializer):
+    """."""
+
+    class Meta:
+        model = Company
+        fields = '__all__'
+
+    news = NewsSerializer(many=True, read_only=True)
+
+
+class ProfileSerializer(ModelSerializer):
+    """."""
+
+    class Meta:
+        model = Profile
+        fields = '__all__'

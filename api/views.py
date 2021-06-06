@@ -1,10 +1,13 @@
 from django.shortcuts import render
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.generics import get_object_or_404
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser
 from rest_framework.viewsets import ModelViewSet
 
 from api.models import Company
 from api.permissions import CustomPermission
-from api.serializers import CompanySerializer
+from api.serializers import CompanySerializer, NewsSerializer, \
+    CompanyDetailSerializer, ProfileSerializer
+from user.models import Profile
 
 
 class CompanyViewSet(ModelViewSet):
@@ -12,7 +15,7 @@ class CompanyViewSet(ModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly, CustomPermission,)
     serializer_class = CompanySerializer
     action_serializers = {
-        'retrieve': CompanySerializer,
+        'retrieve': CompanyDetailSerializer,
         'list': CompanySerializer,
         'create': CompanySerializer
     }
@@ -31,3 +34,28 @@ class CompanyViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+
+class NewsViewSet(ModelViewSet):
+    """."""
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+    serializer_class = NewsSerializer
+
+    def get_queryset(self):
+        company_id = self.kwargs['company_id']
+        company = get_object_or_404(
+            Company.objects.prefetch_related('news').all(),
+            id=company_id,
+        )
+        print(company.news.all())
+        return company.news.all()
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+
+class ProfileViewSet(ModelViewSet):
+    """."""
+    permission_classes = (IsAdminUser,)
+    serializer_class = ProfileSerializer
+    queryset = Profile.objects.all()
