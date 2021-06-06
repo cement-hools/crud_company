@@ -2,7 +2,7 @@ from rest_framework import permissions
 from rest_framework.generics import get_object_or_404
 
 from api.models import Company
-from user.models import Roles
+from user.models import Roles, Profile
 
 
 class CompanyPermission(permissions.BasePermission):
@@ -11,8 +11,10 @@ class CompanyPermission(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.method in permissions.SAFE_METHODS:
             return True
-        if request.user.is_authenticated and not request.user.profile:
-            return False
+        if not Profile.objects.filter(user=request.user).exists():
+            return bool(
+                request.user.is_staff and request.user.is_superuser
+            )
         return bool(
             (request.user.is_staff and request.user.is_superuser)
             or (
@@ -22,12 +24,13 @@ class CompanyPermission(permissions.BasePermission):
         )
 
     def has_object_permission(self, request, view, obj):
+        if request.user.is_staff and request.user.is_superuser:
+            return True
         if not request.user.is_authenticated:
             return False
-
-        if request.user.is_superuser:
-            return True
-        profile = request.user.profile
+        profile = None
+        if Profile.objects.filter(user=request.user).exists():
+            profile = request.user.profile
         if (
                 (
                         request.method in permissions.SAFE_METHODS
@@ -47,7 +50,10 @@ class NewsPermission(permissions.BasePermission):
             return True
         if request.method in permissions.SAFE_METHODS:
             return True
-        if request.user.profile:
+        profile = None
+        if Profile.objects.filter(user=request.user).exists():
+            profile = request.user.profile
+        if profile:
             company_id = view.kwargs.get('company_id')
             company = get_object_or_404(
                 Company.objects.prefetch_related('profiles').all(),
