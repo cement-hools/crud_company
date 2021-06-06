@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser
 from rest_framework.viewsets import ModelViewSet
 
 from api.models import Company
-from api.permissions import CustomPermission
+from api.permissions import CompanyPermission, NewsPermission
 from api.serializers import CompanySerializer, NewsSerializer, \
     CompanyDetailSerializer, ProfileSerializer
 from user.models import Profile
@@ -12,7 +12,7 @@ from user.models import Profile
 
 class CompanyViewSet(ModelViewSet):
     """."""
-    permission_classes = (IsAuthenticatedOrReadOnly, CustomPermission,)
+    permission_classes = (CompanyPermission,)
     serializer_class = CompanySerializer
     action_serializers = {
         'retrieve': CompanyDetailSerializer,
@@ -32,13 +32,13 @@ class CompanyViewSet(ModelViewSet):
         queryset = Company.objects.all()
         return queryset
 
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+    # def perform_create(self, serializer):
+    #     serializer.save(owner=self.request.user)
 
 
 class NewsViewSet(ModelViewSet):
     """."""
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAuthenticatedOrReadOnly, NewsPermission,)
     serializer_class = NewsSerializer
 
     def get_queryset(self):

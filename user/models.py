@@ -6,6 +6,12 @@ from api.models import Company
 User = get_user_model()
 
 
+class Roles(models.TextChoices):
+    """Роли пользователей."""
+    MODERATOR = 'moderator'
+    USER = 'user'
+
+
 class Profile(models.Model):
     user = models.OneToOneField(
         to=User,
@@ -16,7 +22,15 @@ class Profile(models.Model):
         to=Company,
         on_delete=models.CASCADE,
         related_name='profiles',
-        verbose_name='Компания'
+        verbose_name='Компания',
+        null=True,
+        blank=True,
+    )
+
+    role = models.CharField(
+        max_length=20,
+        choices=Roles.choices,
+        default=Roles.USER
     )
 
     class Meta:
