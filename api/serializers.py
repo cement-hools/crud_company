@@ -2,11 +2,11 @@ from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
 from api.models import Company, News
-from user.models import Profile
+from user.models import Profile, User
 
 
 class NewsSerializer(ModelSerializer):
-    """."""
+    """Сериалайзер новостей."""
 
     class Meta:
         model = News
@@ -15,35 +15,19 @@ class NewsSerializer(ModelSerializer):
     author = serializers.SlugRelatedField(slug_field='username',
                                           read_only=True)
     company = serializers.SlugRelatedField(slug_field='name',
-                                          read_only=True)
+                                           read_only=True)
+
 
 class CompanySerializer(ModelSerializer):
-    """."""
+    """Сериалайзер компаний."""
 
     class Meta:
         model = Company
         fields = '__all__'
-        # exclude = ('id',)
-
-    # author = serializers.SlugRelatedField(slug_field='username',
-    #                                       read_only=True)
-
-    # def validate(self, data):
-    #     """У автора только один обзор к Title."""
-    #     if self.context['request'].method == 'POST':
-    #         title_id = self.context['view'].kwargs['title_id']
-    #         author = self.context['request'].user
-    #         review_exists = Review.objects.filter(
-    #             author=author,
-    #             title=title_id).exists()
-    #         if review_exists:
-    #             code_400 = status.HTTP_400_BAD_REQUEST
-    #             raise serializers.ValidationError(code=code_400)
-    #     return data
 
 
 class CompanyDetailSerializer(ModelSerializer):
-    """."""
+    """Сериалайзер подробной информации о компании."""
 
     class Meta:
         model = Company
@@ -57,14 +41,12 @@ class CompanyDetailSerializer(ModelSerializer):
         return amount
 
 
-
-
 class ProfileSerializer(ModelSerializer):
-    """."""
+    """Сериалайзер профилей."""
 
     class Meta:
         model = Profile
         fields = '__all__'
 
     user = serializers.SlugRelatedField(slug_field='username',
-                                          read_only=True)
+                                        queryset=User.objects.all())

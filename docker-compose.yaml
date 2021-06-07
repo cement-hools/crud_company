@@ -12,7 +12,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     env_file:
-      - ./crud_company/.env
+      - .env
   web:
     build: .
     container_name: web
@@ -26,7 +26,7 @@ services:
     depends_on:
       - db
     env_file:
-      - ./crud_company/.env
+      - .env
   nginx:
     image: nginx:1.19-alpine
     volumes:

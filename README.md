@@ -90,25 +90,24 @@
         "company": 1
     }
 ]
-
 ```
-- **POST**```/api/v1/profiles/1/``` Просмотр всех профилей пользователей
-  
-- **GET**```/api/v1/companies/1/news/1/``` Просмотр новости с id=1, которая относится компании с id=1. Доступно всем пользователям
+- **GET**```/api/v1/profiles/``` Просмотр всех профилей пользователей
+- **POST**```/api/v1/profiles/``` Создать профиль, добавить пользователя в компанию. 
+  Указать user, role('moderator', 'user'), company
+- **PUT**```/api/v1/profiles/1/```  Редактировать профиль. Изменить роль пользователя и компанию
+- **DELETE**```/api/v1/profiles/1/``` Удалить профиль
 
-- **PUT**```/api/v1/companies/1/news/1/```  Администратор, Модератор и автор новости могут редактировать новость компании
-- **DELETE**```/api/v1/companies/1/``` Администратор, Модератор и
 
-## Установка и запуск
+## Установка и запуск на сервере разработчика
 1. Клонировать репозиторий
     ```
-    git clone https://github.com/cement-hools/CRUD_for_user_with_token_DRF
+    git clone https://github.com/cement-hools/crud_company
     ```
-2. Перейдите в директорию CRUD_for_user_with_token_DRF
+2. Перейдите в директорию crud_company
     ```
-   cd CRUD_for_user_with_token_DRF
+   cd crud_company
     ```
-3. Создать виртуальное окружение и установить зависимости
+3. Создать виртуальное окружение, активировать и установить зависимости
     ``` 
    python -m venv venv
     ```
@@ -134,11 +133,39 @@
    ```
    python manage.py runserver
    ```
-7. Проект доступен ```http://localhost:8000/```
-
+7. Проект доступен 
+   ```
+   http://localhost:8000/
+   ```
 
 ## Тесты
+```
+python manage.py test
+```
 
+## Запуск в трех контейнерах (PostgreSQL, Web, Nginx)
+
+1. Клонировать репозиторий
+    ```
+    git clone https://github.com/cement-hools/crud_company
+    ```
+2. Перейдите в директорию crud_company
+    ```
+   cd crud_company
+    ```
+3. Запустить docker-compose
+    ```
+    docker-compose up --build
+    ```
+4. Зайти в контейнер и выполнить миграции
+    ```
+    docker-compose exec web python manage.py migrate --noinput
+    ```
+5. Зайти в контейнер и создать суперюзера. Указать username, email, password
+    ```
+    docker-compose exec web python manage.py createsuperuser
+    ```
+7. Проект доступен 
    ```
-   python manage.py test
+   http://127.0.0.1/
    ```
